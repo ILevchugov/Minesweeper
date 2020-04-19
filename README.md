@@ -5,4 +5,5 @@ Implementation of MVC pattern.
 
 For playing just run Mineweeper.jar
 
-![alt text](src/main/resources/images/screenshot.png) 
+
+![alt text](src/main/resources/images/screenshot.png?style=centerme) 
