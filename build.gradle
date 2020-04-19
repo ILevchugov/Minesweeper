@@ -11,7 +11,7 @@ task fatJar(type: Jar) {
     manifest {
         attributes 'Implementation-Title': 'Minesweeper',
                 'Implementation-Version': version,
-                'Main-Class': 'ru.focusstart.levchugov.task3.MinesWeeper'
+                'Main-Class': 'ru.levchugov.minesweeper.MinesWeeper'
     }
     baseName = 'Minesweeper'
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
