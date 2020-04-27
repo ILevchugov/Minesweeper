@@ -22,9 +22,9 @@ class GameField {
         initGameCells();
     }
 
-    public void generateField(int startX, int startY, int minesNum) {
+    public void generateField(int startRowNum, int startColumnNum, int minesNum) {
         initGameCells();
-        generateMines(startX, startY, minesNum);
+        generateMines(startRowNum, startColumnNum, minesNum);
         for (int i = 0; i < rowsNumber; i++) {
             for (int j = 0; j < columnsNumber; j++) {
                 countBombsNear(i, j);
@@ -33,15 +33,15 @@ class GameField {
         logger.info("Game field was generated");
     }
 
-    private void generateMines(int startX, int startY, int minesNum) {
+    private void generateMines(int firstOpenedRowNum, int firstOpenedColumnNum, int minesNum) {
         Random random = new Random();
         int minesPlaced = 0;
         while (minesPlaced < minesNum) {
             int x = random.nextInt(rowsNumber);
             int y = random.nextInt(columnsNumber);
-            if (isCellCanBeMined(gameCells[x][y], startX, startY)) {
+            if (isCellCanBeMined(gameCells[x][y], firstOpenedRowNum, firstOpenedColumnNum)) {
                 if (gameCells[x][y].getContent() != CellContent.BOMB) {
-                    gameCells[x][y].setContent(CellContent.BOMB);
+                    gameCells[x][y].setBomb();
                     minesPlaced++;
                 }
             }
@@ -63,11 +63,13 @@ class GameField {
     private void countBombsNear(int row, int column) {
         List<GameCell> neighbours = getNeighbours(row, column);
         if (gameCells[row][column].getContent() != CellContent.BOMB) {
+            int bombCount = 0;
             for (GameCell neighbour : neighbours) {
                 if (neighbour.getContent() == CellContent.BOMB) {
-                    gameCells[row][column].increaseBombsNear();
+                    bombCount++;
                 }
             }
+            gameCells[row][column].changeBombsNear(bombCount);
         }
     }
 

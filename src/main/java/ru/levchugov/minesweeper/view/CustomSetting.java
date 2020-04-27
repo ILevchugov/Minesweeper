@@ -1,12 +1,12 @@
 package ru.levchugov.minesweeper.view;
 
 import ru.levchugov.minesweeper.controller.MinesweeperController;
-import ru.levchugov.minesweeper.settings.Setting;
+import ru.levchugov.minesweeper.settings.SettingUtils;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class CustomSettingFrame extends JFrame {
+public class CustomSetting {
     private static final int FRAME_WIDTH = 360;
     private static final int FRAME_HEIGHT = 160;
 
@@ -17,6 +17,8 @@ public class CustomSettingFrame extends JFrame {
     private static final int MIN_COLUMN_NUM = 9;
 
     private static final int MIN_MINES_NUM = 10;
+
+    private final JFrame customSettingFrame;
 
     private final JLabel rowsNumText;
     private final JLabel columnsNumText;
@@ -29,10 +31,9 @@ public class CustomSettingFrame extends JFrame {
     private final JButton acceptButton;
     private final GridBagConstraints gbc;
 
-    CustomSettingFrame(MinesweeperController controller) {
-        super("My Settings");
-
-        setLayout(new GridBagLayout());
+    CustomSetting(MinesweeperController controller) {
+        this.customSettingFrame = new JFrame("My Settings");
+        customSettingFrame.setLayout(new GridBagLayout());
         gbc = new GridBagConstraints();
         gbc.weightx = 1;
         gbc.weighty = 1;
@@ -54,9 +55,9 @@ public class CustomSettingFrame extends JFrame {
 
         init();
 
-        setSize(FRAME_WIDTH, FRAME_HEIGHT);
-        setLocationRelativeTo(null);
-        setResizable(false);
+        customSettingFrame.setSize(FRAME_WIDTH, FRAME_HEIGHT);
+        customSettingFrame.setLocationRelativeTo(null);
+        customSettingFrame.setResizable(false);
     }
 
     private void init() {
@@ -64,7 +65,8 @@ public class CustomSettingFrame extends JFrame {
 
         rowsSlider.setMaximum(MAX_ROWS_NUM);
         rowsSlider.setMinimum(MIN_ROWS_NUM);
-        rowsSlider.addChangeListener(changeEvent -> minesSlider.setMaximum(Setting.getMaxNumOfMines(rowsSlider.getValue(), columnsSlider.getValue())));
+        rowsSlider.addChangeListener(changeEvent -> minesSlider.setMaximum(SettingUtils.getMaxNumOfMines(rowsSlider.getValue(),
+                columnsSlider.getValue())));
         setSliderListener(rowsSlider, rowsNumText);
         rowsNumText.setText("Rows: " + rowsSlider.getValue());
         setGridItem(rowsSlider, 1, 0, GridBagConstraints.WEST);
@@ -73,7 +75,8 @@ public class CustomSettingFrame extends JFrame {
 
         columnsSlider.setMaximum(MAX_COLUMNS_NUM);
         columnsSlider.setMinimum(MIN_COLUMN_NUM);
-        columnsSlider.addChangeListener(changeEvent -> minesSlider.setMaximum(Setting.getMaxNumOfMines(rowsSlider.getValue(), columnsSlider.getValue())));
+        columnsSlider.addChangeListener(changeEvent -> minesSlider.setMaximum(SettingUtils.getMaxNumOfMines(rowsSlider.getValue(),
+                columnsSlider.getValue())));
         setSliderListener(columnsSlider, columnsNumText);
         columnsNumText.setText("Columns: " + columnsSlider.getValue());
         setGridItem(columnsSlider, 1, 1, GridBagConstraints.WEST);
@@ -82,7 +85,7 @@ public class CustomSettingFrame extends JFrame {
         minesNumText.setText("Mines: " + String.format("%2d", minesSlider.getValue()));
 
         setSliderListener(minesSlider, minesNumText);
-        minesSlider.setMaximum(Setting.getMaxNumOfMines(rowsSlider.getValue(), columnsSlider.getValue()));
+        minesSlider.setMaximum(SettingUtils.getMaxNumOfMines(rowsSlider.getValue(), columnsSlider.getValue()));
         minesSlider.setMinimum(MIN_MINES_NUM);
         setGridItem(minesSlider, 1, 2, GridBagConstraints.WEST);
 
@@ -94,7 +97,7 @@ public class CustomSettingFrame extends JFrame {
         gbc.gridx = gridx;
         gbc.gridy = gridy;
         gbc.anchor = Side;
-        add(component, gbc);
+        customSettingFrame.add(component, gbc);
     }
 
     private void setSliderListener(JSlider slider, JLabel text) {
@@ -103,8 +106,12 @@ public class CustomSettingFrame extends JFrame {
 
     private void setListener(MinesweeperController controller) {
         acceptButton.addActionListener(actionEvent -> {
-            controller.setDifficulty(Setting.getCustomSetting(rowsSlider.getValue(), columnsSlider.getValue(), minesSlider.getValue()));
-            setVisible(false);
+            controller.setDifficulty(SettingUtils.getCustomSetting(rowsSlider.getValue(), columnsSlider.getValue(), minesSlider.getValue()));
+            customSettingFrame.setVisible(false);
         });
+    }
+
+    void setVisible() {
+        customSettingFrame.setVisible(true);
     }
 }

@@ -24,6 +24,7 @@ public class MinesWeeper {
         SwingMinesweeperView view = new SwingMinesweeperView(controller);
 
         game.attachView(view);
+        game.startGameSession();
     }
 
     //trick to forbid running several apps

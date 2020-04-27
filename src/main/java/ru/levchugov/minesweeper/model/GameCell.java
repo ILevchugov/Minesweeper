@@ -5,24 +5,24 @@ import lombok.Setter;
 import ru.levchugov.minesweeper.cellstate.CellContent;
 import ru.levchugov.minesweeper.cellstate.CellStatus;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @Getter
 public class GameCell {
-    private static final List<CellContent> cellContentList;
+    private static final Map<Integer, CellContent> CELL_CONTENT_MAP;
 
     static {
-        cellContentList = new ArrayList<>();
-        cellContentList.add(CellContent.EMPTY);
-        cellContentList.add(CellContent.ONE_BOMB_NEAR);
-        cellContentList.add(CellContent.TWO_BOMB_NEAR);
-        cellContentList.add(CellContent.THREE_BOMB_NEAR);
-        cellContentList.add(CellContent.FOUR_BOMB_NEAR);
-        cellContentList.add(CellContent.FIVE_BOMB_NEAR);
-        cellContentList.add(CellContent.SIX_BOMB_NEAR);
-        cellContentList.add(CellContent.SEVEN_BOMB_NEAR);
-        cellContentList.add(CellContent.EIGHT_BOMB_NEAR);
+        CELL_CONTENT_MAP = new HashMap<>();
+        CELL_CONTENT_MAP.put(0, CellContent.EMPTY);
+        CELL_CONTENT_MAP.put(1, CellContent.ONE_BOMB_NEAR);
+        CELL_CONTENT_MAP.put(2, CellContent.TWO_BOMB_NEAR);
+        CELL_CONTENT_MAP.put(3, CellContent.THREE_BOMB_NEAR);
+        CELL_CONTENT_MAP.put(4, CellContent.FOUR_BOMB_NEAR);
+        CELL_CONTENT_MAP.put(5, CellContent.FIVE_BOMB_NEAR);
+        CELL_CONTENT_MAP.put(6, CellContent.SIX_BOMB_NEAR);
+        CELL_CONTENT_MAP.put(7, CellContent.SEVEN_BOMB_NEAR);
+        CELL_CONTENT_MAP.put(8, CellContent.EIGHT_BOMB_NEAR);
     }
 
     private final int row;
@@ -32,7 +32,7 @@ public class GameCell {
 
     @Setter
     private CellStatus status;
-    @Setter
+
     private CellContent content;
 
     public GameCell(int row, int column) {
@@ -42,9 +42,12 @@ public class GameCell {
         this.column = column;
     }
 
-    public void increaseBombsNear() {
-        bombsNearNum++;
-        content = cellContentList.get(bombsNearNum);
+    public void changeBombsNear(int bombsNearNum) {
+        this.bombsNearNum = bombsNearNum;
+        content = CELL_CONTENT_MAP.get(bombsNearNum);
     }
 
+    public void setBomb() {
+        content = CellContent.BOMB;
+    }
 }

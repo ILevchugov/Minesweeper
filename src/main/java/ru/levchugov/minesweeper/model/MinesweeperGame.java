@@ -2,9 +2,9 @@ package ru.levchugov.minesweeper.model;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.levchugov.minesweeper.bestscores.BestScores;
 import ru.levchugov.minesweeper.cellstate.CellContent;
 import ru.levchugov.minesweeper.cellstate.CellStatus;
+import ru.levchugov.minesweeper.model.bestscores.BestScoresManager;
 import ru.levchugov.minesweeper.settings.Setting;
 import ru.levchugov.minesweeper.view.MinesweeperView;
 
@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 public class MinesweeperGame {
     private static final Logger logger = LoggerFactory.getLogger(MinesweeperGame.class);
 
-    private final BestScores bestScores;
+    private final BestScoresManager bestScoresManager;
     private final MinesweeperNotifier minesweeperNotifier;
 
     private GameField gameField;
@@ -25,7 +25,7 @@ public class MinesweeperGame {
     private int openedCells;
     private int flagStated;
 
-    private boolean isAllCellsClosed;
+    private boolean areAllCellsClosed;
 
     private long startTime;
 
@@ -33,8 +33,12 @@ public class MinesweeperGame {
 
     public MinesweeperGame() {
         this.setting = Setting.EASY;
-        this.bestScores = BestScores.getInstance();
+        this.bestScoresManager = BestScoresManager.getInstance();
         this.minesweeperNotifier = new MinesweeperNotifier();
+    }
+
+    public void startGameSession() {
+        minesweeperNotifier.notifyViewInitLeaderBoard(bestScoresManager.getScores());
         prepareNewGame();
     }
 
@@ -45,7 +49,8 @@ public class MinesweeperGame {
         this.gameField = new GameField(rowNum, columnNum);
         this.flagStated = 0;
         this.openedCells = 0;
-        this.isAllCellsClosed = true;
+        this.areAllCellsClosed = true;
+
         minesweeperNotifier.notifyViewAboutNewGame(rowNum, columnNum, minesNum);
     }
 
@@ -59,7 +64,7 @@ public class MinesweeperGame {
     }
 
     public void openCell(int row, int column) {
-        if (isAllCellsClosed) {
+        if (areAllCellsClosed) {
             startGame(row, column);
         }
         GameCell currentCell = gameField.getGameCell(row, column);
@@ -77,7 +82,7 @@ public class MinesweeperGame {
     private void startGame(int row, int column) {
         logger.info("New game started");
         gameField.generateField(row, column, minesNum);
-        isAllCellsClosed = false;
+        areAllCellsClosed = false;
         startTime = System.nanoTime();
         minesweeperNotifier.notifySetTimer();
     }
@@ -95,31 +100,33 @@ public class MinesweeperGame {
             currentCell.setStatus(CellStatus.CLOSED);
             flagStated--;
             minesweeperNotifier.notifyViewUpdateFlagStatus(row, column, minesNum - flagStated, CellStatus.CLOSED);
-        } else {
-            if (currentCell.getStatus() == CellStatus.CLOSED && !isAllCellsClosed) {
-                currentCell.setStatus(CellStatus.FLAGGED);
-                flagStated++;
-                minesweeperNotifier.notifyViewUpdateFlagStatus(row, column, minesNum - flagStated, CellStatus.FLAGGED);
-            }
+        } else if (currentCell.getStatus() == CellStatus.CLOSED && !areAllCellsClosed) {
+            currentCell.setStatus(CellStatus.FLAGGED);
+            flagStated++;
+            minesweeperNotifier.notifyViewUpdateFlagStatus(row, column, minesNum - flagStated, CellStatus.FLAGGED);
         }
     }
 
-    public void openCellsAroundOpenCell(int row, int column) {
+
+    public void openCellsAroundOpenedCell(int row, int column) {
         GameCell currentCell = gameField.getGameCell(row, column);
-        if (currentCell.getStatus() == CellStatus.OPENED) {
-            if (isFlagsAroundEqualsBombsNear(row, column)) {
-                List<GameCell> neighbors = gameField.getNeighbours(row, column);
-                for (GameCell neighbor : neighbors) {
-                    openCell(neighbor.getRow(), neighbor.getColumn());
-                    if (isAllCellsClosed) {
-                        break;
-                    }
+        if (isAvailableToOpenCellsAround(currentCell)) {
+            List<GameCell> neighbors = gameField.getNeighbours(row, column);
+            for (GameCell neighbor : neighbors) {
+                openCell(neighbor.getRow(), neighbor.getColumn());
+                if (areAllCellsClosed) {
+                    break;
                 }
             }
         }
     }
 
-    private boolean isFlagsAroundEqualsBombsNear(int row, int column) {
+    private boolean isAvailableToOpenCellsAround(GameCell currentCell) {
+        return currentCell.getStatus() == CellStatus.OPENED &&
+                areFlagsAroundEqualsBombsNear(currentCell.getRow(), currentCell.getColumn());
+    }
+
+    private boolean areFlagsAroundEqualsBombsNear(int row, int column) {
         GameCell currentCell = gameField.getGameCell(row, column);
         List<GameCell> neighbors = gameField.getNeighbours(row, column);
         int flagsNum = 0;
@@ -137,25 +144,26 @@ public class MinesweeperGame {
             minesweeperNotifier.notifyViewAboutLose();
             logger.info("Game ended with lose");
             prepareNewGame();
-        } else {
-            if (isGameWin()) {
-                long finishTime = System.nanoTime();
-                bestScores.addScore(setting, TimeUnit.NANOSECONDS.toSeconds(finishTime - startTime));
-                logger.info("Game ended with win");
-                minesweeperNotifier.notifyStopTimer();
-                minesweeperNotifier.notifyViewAboutWin();
-                minesweeperNotifier.notifyViewUpdateLeaderBoard(setting);
-                prepareNewGame();
+        }
+        if (isGameWon()) {
+            long finishTime = System.nanoTime();
+            if (!setting.isCustom()) {
+                bestScoresManager.addScore(setting, TimeUnit.NANOSECONDS.toSeconds(finishTime - startTime));
+                minesweeperNotifier.notifyViewUpdateLeaderBoard(setting, bestScoresManager.getScore(setting));
             }
+            logger.info("Game ended with win");
+            minesweeperNotifier.notifyStopTimer();
+            minesweeperNotifier.notifyViewAboutWin();
+            prepareNewGame();
         }
     }
+
 
     private boolean isGameLost(int row, int column) {
         return gameField.getGameCell(row, column).getContent() == CellContent.BOMB;
     }
 
-    private boolean isGameWin() {
+    private boolean isGameWon() {
         return openedCells == rowNum * columnNum - minesNum;
     }
-
 }

@@ -7,51 +7,54 @@ import ru.levchugov.minesweeper.settings.Setting;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Map;
 import java.util.Optional;
 
-public class SwingMinesweeperView extends JFrame implements MinesweeperView {
+public class SwingMinesweeperView implements MinesweeperView {
+    private final JFrame playingFrame;
     private final MinesweeperField minesweeperField;
     private final MinesweeperDisplay display;
     private final MinesweeperBar bar;
 
     public SwingMinesweeperView(MinesweeperController controller) {
-        super("Minesweeper : CORONAVIRUS EDITION");
-        this.minesweeperField = new MinesweeperField(Setting.EASY.getRowNum(), Setting.EASY.getColumnNum(), controller);
+        this.playingFrame = new JFrame("Minesweeper : CORONAVIRUS EDITION");
+        this.minesweeperField = new MinesweeperField(controller);
         this.display = new MinesweeperDisplay();
         this.bar = new MinesweeperBar(controller);
-        display.setBombNums(Setting.EASY.getMinesNum());
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+    }
+
+    private void init() {
+        playingFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         setIcon();
         setMenuBar();
         setGamePanel();
         setDisplay();
 
-        pack();
+        playingFrame.pack();
 
-        setResizable(false);
-        setVisible(true);
+        playingFrame.setResizable(false);
+        playingFrame.setVisible(true);
     }
-
     private void setGamePanel() {
         JPanel panel = minesweeperField.getField();
-        add(panel);
+        playingFrame.add(panel);
     }
 
     private void setMenuBar() {
         JMenuBar bar1 = bar.getMenuBar();
-        setJMenuBar(bar1);
+        playingFrame.setJMenuBar(bar1);
     }
 
     private void setDisplay() {
         JPanel displayPanel = display.getDisplay();
-        add(displayPanel, BorderLayout.SOUTH);
+        playingFrame.add(displayPanel, BorderLayout.SOUTH);
     }
 
     private void setIcon() {
         IconRegistry iconRegistry = new IconRegistry();
         Optional<ImageIcon> imageIconOpt = iconRegistry.getImageForCell(CellContent.BOMB);
-        imageIconOpt.ifPresent(imageIcon -> setIconImage(imageIcon.getImage()));
+        imageIconOpt.ifPresent(imageIcon -> playingFrame.setIconImage(imageIcon.getImage()));
     }
 
     @Override
@@ -66,12 +69,12 @@ public class SwingMinesweeperView extends JFrame implements MinesweeperView {
 
     @Override
     public void getLoseMessage() {
-        JOptionPane.showMessageDialog(this, "CORONAVIRUS WIN!", ":(", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(playingFrame, "CORONAVIRUS WIN!", ":(", JOptionPane.INFORMATION_MESSAGE);
     }
 
     @Override
     public void getWinMessage() {
-        JOptionPane.showMessageDialog(this, "YOU WIN!", ":)", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(playingFrame, "YOU WIN!", ":)", JOptionPane.INFORMATION_MESSAGE);
     }
 
     @Override
@@ -90,15 +93,21 @@ public class SwingMinesweeperView extends JFrame implements MinesweeperView {
     }
 
     @Override
-    public void updateLeaderBoard(Setting setting) {
-        bar.updateLeaderBoard(setting);
+    public void initLeaderBoard(Map<Setting, Long> scores) {
+        bar.initLeaderBoard(scores);
+    }
+
+    @Override
+    public void updateLeaderBoard(Setting setting, long time) {
+        bar.updateLeaderBoard(setting, time);
     }
 
     @Override
     public void renderNewGame(int rowNumber, int columnNumber, int minesNumber) {
+        init();
         display.resetTimer();
         display.setBombNums(minesNumber);
         minesweeperField.getNewField(rowNumber, columnNumber);
-        pack();
+        playingFrame.pack();
     }
 }

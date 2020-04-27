@@ -10,5 +10,5 @@ public enum CellContent {
     FIVE_BOMB_NEAR,
     SIX_BOMB_NEAR,
     SEVEN_BOMB_NEAR,
-    EIGHT_BOMB_NEAR,
+    EIGHT_BOMB_NEAR
 }

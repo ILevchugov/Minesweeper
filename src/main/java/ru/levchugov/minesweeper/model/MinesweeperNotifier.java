@@ -7,6 +7,7 @@ import ru.levchugov.minesweeper.view.MinesweeperView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class MinesweeperNotifier {
     private final List<MinesweeperView> minesweeperViews = new ArrayList<>();
@@ -32,8 +33,12 @@ public class MinesweeperNotifier {
         minesweeperViews.forEach(MinesweeperView::getWinMessage);
     }
 
-    void notifyViewUpdateLeaderBoard(Setting setting) {
-        minesweeperViews.forEach(minesweeperView -> minesweeperView.updateLeaderBoard(setting));
+    void notifyViewInitLeaderBoard(Map<Setting, Long> scores) {
+        minesweeperViews.forEach(minesweeperView -> minesweeperView.initLeaderBoard(scores));
+    }
+
+    void notifyViewUpdateLeaderBoard(Setting setting, long time) {
+        minesweeperViews.forEach(minesweeperView -> minesweeperView.updateLeaderBoard(setting, time));
     }
 
     void notifyViewAboutNewGame(int rowNumber, int columnNumber, int minesNumber) {

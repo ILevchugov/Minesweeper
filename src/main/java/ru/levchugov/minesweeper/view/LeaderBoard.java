@@ -1,6 +1,7 @@
 package ru.levchugov.minesweeper.view;
 
-import ru.levchugov.minesweeper.bestscores.BestScores;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.levchugov.minesweeper.settings.Setting;
 
 import javax.swing.*;
@@ -11,21 +12,22 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 
-public class LeaderBoardFrame extends JFrame {
+public class LeaderBoard {
+    private static final Logger logger = LoggerFactory.getLogger(LeaderBoard.class);
+
     private static final SimpleDateFormat timeFormat = new SimpleDateFormat("mm:ss");
     private static final Font LABELS_FONT = new Font(Font.SANS_SERIF, Font.BOLD, 16);
 
     private static final int FRAME_WIDTH = 250;
     private static final int FRAME_HEIGHT = 110;
 
-    private final BestScores bestScores;
+    private final JFrame leaderBoard;
 
     private final Map<String, JLabel> recordsText;
     private final GridBagConstraints gridBagConstraints;
 
-    LeaderBoardFrame() {
-        super("Best scores");
-        this.bestScores = BestScores.getInstance();
+    LeaderBoard() {
+        this.leaderBoard = new JFrame("Best Scores");
         this.gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.weightx = 1;
 
@@ -39,12 +41,12 @@ public class LeaderBoardFrame extends JFrame {
         JLabel valueHard = new JLabel();
         recordsText.put(Setting.HARD.getName(), valueHard);
 
-        setLayout(new GridBagLayout());
+        leaderBoard.setLayout(new GridBagLayout());
 
         setLabels();
 
-        setSize(FRAME_WIDTH, FRAME_HEIGHT);
-        setResizable(false);
+        leaderBoard.setSize(FRAME_WIDTH, FRAME_HEIGHT);
+        leaderBoard.setResizable(false);
 
     }
 
@@ -58,21 +60,25 @@ public class LeaderBoardFrame extends JFrame {
         gridBagConstraints.gridy = gridy;
         JLabel nameLabel = new JLabel(setting.getName());
         nameLabel.setFont(LABELS_FONT);
-        add(nameLabel, gridBagConstraints);
+        leaderBoard.add(nameLabel, gridBagConstraints);
 
         JLabel textLabel = recordsText.get(setting.getName());
         textLabel.setFont(LABELS_FONT);
 
-        long time = TimeUnit.SECONDS.toMillis((bestScores.getScore(setting)));
-
-        textLabel.setText(timeFormat.format(time));
-        add(textLabel, gridBagConstraints);
+        leaderBoard.add(textLabel, gridBagConstraints);
     }
 
-    public void updateLeaderBoard(Setting setting) {
-        if (recordsText.containsKey(setting.getName())) {
-            long time = TimeUnit.SECONDS.toMillis((bestScores.getScore(setting)));
-            recordsText.get(setting.getName()).setText(timeFormat.format(time));
-        }
+    void initLeaderBoard(Map<Setting, Long> scores) {
+            recordsText.get(Setting.EASY.getName()).setText(timeFormat.format(TimeUnit.SECONDS.toMillis(scores.get(Setting.EASY))));
+            recordsText.get(Setting.MIDDLE.getName()).setText(timeFormat.format(TimeUnit.SECONDS.toMillis(scores.get(Setting.MIDDLE))));
+            recordsText.get(Setting.HARD.getName()).setText(timeFormat.format(TimeUnit.SECONDS.toMillis(scores.get(Setting.HARD))));
+    }
+
+    void updateLeaderBoard(Setting setting, long time) {
+        logger.info("Prishel suda" + time);
+            recordsText.get(setting.getName()).setText(timeFormat.format(TimeUnit.SECONDS.toMillis(time)));
+    }
+    void setVisible() {
+        leaderBoard.setVisible(true);
     }
 }

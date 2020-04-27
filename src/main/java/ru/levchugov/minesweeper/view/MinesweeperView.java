@@ -4,6 +4,8 @@ import ru.levchugov.minesweeper.cellstate.CellContent;
 import ru.levchugov.minesweeper.cellstate.CellStatus;
 import ru.levchugov.minesweeper.settings.Setting;
 
+import java.util.Map;
+
 public interface MinesweeperView {
     void renderNewGame(int rowNumber, int columnNumber, int minesNumber);
 
@@ -21,6 +23,7 @@ public interface MinesweeperView {
 
     void stopTimer();
 
-    void updateLeaderBoard(Setting setting);
+    void initLeaderBoard(Map<Setting, Long> scores);
 
+    void updateLeaderBoard(Setting setting, long time);
 }

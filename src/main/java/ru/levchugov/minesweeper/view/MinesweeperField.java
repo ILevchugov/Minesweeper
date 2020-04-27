@@ -22,10 +22,9 @@ public class MinesweeperField {
 
     private JLabel[][] cells;
 
-    MinesweeperField(int rowNum, int columnNum, MinesweeperController controller) {
+    MinesweeperField(MinesweeperController controller) {
         this.field = new JPanel();
         this.controller = controller;
-        setMinesweeperField(rowNum, columnNum);
     }
 
     private void setMinesweeperField(int rowNum, int columnNum) {
@@ -64,17 +63,17 @@ public class MinesweeperField {
         });
     }
 
-    public void updateCell(int row, int column, CellStatus status) {
+    void updateCell(int row, int column, CellStatus status) {
         Optional<ImageIcon> imageIconOpt = iconRegistry.getImageForCell(status);
         imageIconOpt.ifPresent(imageIcon -> cells[row][column].setIcon(imageIcon));
     }
 
-    public void updateCell(int row, int column, CellContent content) {
+    void updateCell(int row, int column, CellContent content) {
         Optional<ImageIcon> imageIconOpt = iconRegistry.getImageForCell(content);
         imageIconOpt.ifPresent(imageIcon -> cells[row][column].setIcon(imageIcon));
     }
 
-    public void getNewField(int rowNum, int columnNum) {
+    void getNewField(int rowNum, int columnNum) {
         field.removeAll();
         setMinesweeperField(rowNum, columnNum);
         field.repaint();

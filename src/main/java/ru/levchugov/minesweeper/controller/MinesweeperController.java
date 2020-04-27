@@ -28,7 +28,6 @@ public class MinesweeperController {
     }
 
     public void handleUserClickedMiddleButtonOnCell(int row, int column) {
-        minesweeperGame.openCellsAroundOpenCell(row, column);
-
+        minesweeperGame.openCellsAroundOpenedCell(row, column);
     }
 }

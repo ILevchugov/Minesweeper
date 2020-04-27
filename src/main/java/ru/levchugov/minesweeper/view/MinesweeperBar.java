@@ -5,18 +5,19 @@ import ru.levchugov.minesweeper.settings.Setting;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Map;
 
 public class MinesweeperBar {
     private final JMenuBar menuBar;
     private final MinesweeperController controller;
-    private final CustomSettingFrame customSettingView;
-    private final LeaderBoardFrame leaderBoard;
+    private final CustomSetting customSettingView;
+    private final LeaderBoard leaderBoard;
 
     MinesweeperBar(MinesweeperController controller) {
         this.controller = controller;
-        this.customSettingView = new CustomSettingFrame(controller);
+        this.customSettingView = new CustomSetting(controller);
         this.menuBar = new JMenuBar();
-        this.leaderBoard = new LeaderBoardFrame();
+        this.leaderBoard = new LeaderBoard();
         menuBar.setLayout(new BorderLayout());
         createMinesweeperBar();
     }
@@ -37,14 +38,14 @@ public class MinesweeperBar {
         setHardDifficulty.addActionListener(actionEvent -> controller.setDifficulty(Setting.HARD));
 
         JMenuItem setCustomDifficulty = new JMenuItem("Custom difficulty");
-        setCustomDifficulty.addActionListener(actionEvent -> customSettingView.setVisible(true));
+        setCustomDifficulty.addActionListener(actionEvent -> customSettingView.setVisible());
 
         JMenuItem exit = new JMenuItem("Exit");
         exit.addActionListener(actionEvent -> System.exit(0));
 
         JMenu bestScoresMenu = new JMenu("Best Scores");
         JMenuItem showScores = new JMenuItem("Show");
-        showScores.addActionListener(actionEvent -> leaderBoard.setVisible(true));
+        showScores.addActionListener(actionEvent -> leaderBoard.setVisible());
         bestScoresMenu.add(showScores);
 
         jMenu.add(newGame);
@@ -60,11 +61,15 @@ public class MinesweeperBar {
         menuBar.add(bestScoresMenu);
     }
 
-    public void updateLeaderBoard(Setting setting) {
-        leaderBoard.updateLeaderBoard(setting);
+    void initLeaderBoard(Map<Setting, Long> scores) {
+        leaderBoard.initLeaderBoard(scores);
     }
 
-    public JMenuBar getMenuBar() {
+    void updateLeaderBoard(Setting setting, long time) {
+        leaderBoard.updateLeaderBoard(setting, time);
+    }
+
+    JMenuBar getMenuBar() {
         return menuBar;
     }
 }

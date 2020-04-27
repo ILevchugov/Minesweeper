@@ -1,33 +1,33 @@
-package ru.levchugov.minesweeper.bestscores;
+package ru.levchugov.minesweeper.model.bestscores;
 
 import ru.levchugov.minesweeper.settings.Setting;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class BestScores {
+public final class BestScoresManager {
     private final Map<Setting, Long> scores;
-    private static BestScores instance;
+    private static BestScoresManager instance;
 
     private final BestScoresStorage bestScoresStorage;
 
-    public static BestScores getInstance() {
+    public static BestScoresManager getInstance() {
         if (instance == null) {
-            instance = new BestScores();
+            instance = new BestScoresManager();
         }
         return instance;
     }
 
-    private BestScores() {
+    private BestScoresManager() {
         scores = new HashMap<>();
         bestScoresStorage = new BestScoresStorage();
         init();
     }
 
     private void init() {
-        scores.put(Setting.EASY, (long) bestScoresStorage.getScore("Easy"));
-        scores.put(Setting.MIDDLE, (long) bestScoresStorage.getScore("Middle"));
-        scores.put(Setting.HARD, (long) bestScoresStorage.getScore("Hard"));
+        scores.put(Setting.EASY, bestScoresStorage.getScore("Easy"));
+        scores.put(Setting.MIDDLE, bestScoresStorage.getScore("Middle"));
+        scores.put(Setting.HARD, bestScoresStorage.getScore("Hard"));
     }
 
     public void addScore(Setting setting, long score) {
@@ -42,5 +42,10 @@ public class BestScores {
 
     public Long getScore(Setting setting) {
         return scores.get(setting);
+    }
+
+
+    public Map<Setting, Long> getScores() {
+        return scores;
     }
 }

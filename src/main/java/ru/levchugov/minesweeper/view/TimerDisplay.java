@@ -23,17 +23,17 @@ public class TimerDisplay {
                 TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime))));
     }
 
-    public void startTimer() {
+    void startTimer() {
         startTime = System.nanoTime();
         timeText.setText(DEFAULT_TIME);
         timer.start();
     }
 
-    public void stopTimer() {
+    void stopTimer() {
         timer.stop();
     }
 
-    public void resetTimer() {
+    void resetTimer() {
         timeText.setText(DEFAULT_TIME);
         timer.stop();
     }

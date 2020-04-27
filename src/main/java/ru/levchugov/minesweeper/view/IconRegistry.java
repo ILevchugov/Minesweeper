@@ -15,7 +15,7 @@ public class IconRegistry {
     private final ImageIcon minesCounterIcon;
     private final ImageIcon timer;
 
-    public IconRegistry() {
+    IconRegistry() {
         cellIconMap.put(CellContent.BOMB, new ImageIcon(IconRegistry.class.getResource("/images/corona.png")));
         cellIconMap.put(CellContent.ONE_BOMB_NEAR, new ImageIcon(IconRegistry.class.getResource("/images/one.png")));
         cellIconMap.put(CellContent.TWO_BOMB_NEAR, new ImageIcon(IconRegistry.class.getResource("/images/two.png")));

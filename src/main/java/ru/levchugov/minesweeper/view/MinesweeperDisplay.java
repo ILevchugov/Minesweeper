@@ -66,23 +66,23 @@ public class MinesweeperDisplay {
         display.add(timerIcon, gridBagConstraints);
     }
 
-    public void setBombNums(int bombNums) {
+    void setBombNums(int bombNums) {
         bombCounter.setText(String.valueOf(bombNums));
     }
 
-    public void startTimer() {
+    void startTimer() {
         timerDisplay.startTimer();
     }
 
-    public void resetTimer() {
+    void resetTimer() {
         timerDisplay.resetTimer();
     }
 
-    public void stopTimer() {
+    void stopTimer() {
         timerDisplay.stopTimer();
     }
 
-    public JPanel getDisplay() {
+    JPanel getDisplay() {
         return display;
     }
 }
